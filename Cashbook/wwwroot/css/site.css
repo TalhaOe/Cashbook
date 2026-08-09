@@ -180,3 +180,58 @@ h1 {
 .table-hover tbody tr:hover {
     background-color: #fafafa;
 }
+
+.invoice-total {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.03em;
+}
+
+.section-label {
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.detail-label {
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.detail-value {
+    color: #111827;
+    font-weight: 600;
+}
+
+.invoice-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #eef0f2;
+}
+
+.invoice-summary-total {
+    border-bottom: 0;
+    padding-top: 1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.invoice-item td {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.invoice-item .form-control,
+.invoice-item .form-select {
+    min-height: 38px;
+}
+
+.card .section-label + h5 {
+    margin-top: 0;
+}
