@@ -4,65 +4,124 @@
     ViewData["Title"] = "Rechnungen";
 }
 
-<h1>Rechnungen</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Rechnungen</h1>
+        <p class="text-muted mb-0">
+            Übersicht über offene, bezahlte und stornierte Rechnungen
+        </p>
+    </div>
 
-<p>
     <a asp-action="Create" class="btn btn-primary">
         Neue Rechnung
     </a>
-</p>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Rechnungsnummer</th>
-            <th>Datum</th>
-            <th>Empfänger</th>
-            <th>Netto</th>
-            <th>USt.</th>
-            <th>Brutto</th>
-            <th></th>
-        </tr>
-    </thead>
+<div class="card">
+    <div class="card-body p-0">
 
-    <tbody>
-        @foreach (var invoice in Model)
-        {
-            <tr>
-                <td>
-                    @invoice.InvoiceNumber
-                </td>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Rechnungsnummer</th>
+                        <th>Datum</th>
+                        <th>Empfänger</th>
+                        <th>Art</th>
+                        <th>Status</th>
+                        <th class="text-end">Netto</th>
+                        <th class="text-end">USt.</th>
+                        <th class="text-end">Brutto</th>
+                        <th class="text-end">Aktionen</th>
+                    </tr>
+                </thead>
 
-                <td>
-                    @invoice.InvoiceDate.ToString("dd.MM.yyyy")
-                </td>
+                <tbody>
+                    @foreach (var invoice in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="fw-semibold">
+                                    @invoice.InvoiceNumber
+                                </span>
+                            </td>
 
-                <td>
-                    @invoice.RecipientName
-                </td>
+                            <td>
+                                @invoice.InvoiceDate.ToString("dd.MM.yyyy")
+                            </td>
 
-                <td>
-                    @invoice.NetAmount.ToString("N2") €
-                </td>
+                            <td>
+                                @invoice.RecipientName
+                            </td>
 
-                <td>
-                    @invoice.VatAmount.ToString("N2") €
-                </td>
+                            <td>
+                                @if (invoice.Type == Cashbook.Models.InvoiceType.Outgoing)
+                                {
+                                    <span>Ausgang</span>
+                                }
+                                else
+                                {
+                                    <span>Eingang</span>
+                                }
+                            </td>
 
-                <td>
-                    <strong>
-                        @invoice.GrossAmount.ToString("N2") €
-                    </strong>
-                </td>
+                            <td>
+                                @switch (invoice.Status)
+                                {
+                                    case Cashbook.Models.InvoiceStatus.Open:
+                                        <span class="badge bg-warning text-dark">
+                                            Offen
+                                        </span>
+                                        break;
 
-                <td>
-                    <a asp-action="Details"
-                       asp-route-id="@invoice.Id"
-                       class="btn btn-sm btn-outline-secondary">
-                        Details
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                                    case Cashbook.Models.InvoiceStatus.Paid:
+                                        <span class="badge bg-success">
+                                            Bezahlt
+                                        </span>
+                                        break;
+
+                                    case Cashbook.Models.InvoiceStatus.Cancelled:
+                                        <span class="badge bg-secondary">
+                                            Storniert
+                                        </span>
+                                        break;
+                                }
+                            </td>
+
+                            <td class="text-end">
+                                @invoice.NetAmount.ToString("N2") €
+                            </td>
+
+                            <td class="text-end">
+                                @invoice.VatAmount.ToString("N2") €
+                            </td>
+
+                            <td class="text-end fw-bold">
+                                @invoice.GrossAmount.ToString("N2") €
+                            </td>
+
+                            <td class="text-end">
+                                <a asp-action="Details"
+                                   asp-route-id="@invoice.Id"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    Details
+                                </a>
+                            </td>
+                        </tr>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9"
+                                class="text-center text-muted py-5">
+                                Noch keine Rechnungen vorhanden.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
