@@ -1,8 +1,206 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Cashbook.Models
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var recentEntries =
+        ViewBag.RecentEntries as List<CashEntry>
+        ?? new List<CashEntry>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="mb-4">
+    <h1 class="mb-1">Dashboard</h1>
+
+    <p class="text-muted mb-0">
+        Überblick über dein Kassenbuch und deine Rechnungen
+    </p>
+</div>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="summary-label">
+                    Einnahmen
+                </div>
+
+                <div class="summary-value text-success">
+                    @ViewBag.TotalIncome.ToString("N2") €
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="summary-label">
+                    Ausgaben
+                </div>
+
+                <div class="summary-value text-danger">
+                    @ViewBag.TotalExpenses.ToString("N2") €
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="summary-label">
+                    Kassenstand
+                </div>
+
+                <div class="summary-value">
+                    @ViewBag.Balance.ToString("N2") €
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="summary-label">
+                    Offene Rechnungen
+                </div>
+
+                <div class="summary-value">
+                    @ViewBag.OpenInvoices
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="row g-4">
+
+    <div class="col-xl-8">
+        <div class="card h-100">
+
+            <div class="card-body p-0">
+
+                <div class="d-flex justify-content-between align-items-center px-4 pt-4 pb-3">
+                    <div>
+                        <h4 class="mb-1">Letzte Buchungen</h4>
+                        <p class="text-muted small mb-0">
+                            Die zuletzt erfassten Kassenbewegungen
+                        </p>
+                    </div>
+
+                    <a asp-controller="CashEntries"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary">
+                        Alle anzeigen
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Beschreibung</th>
+                                <th>Typ</th>
+                                <th class="text-end">Betrag</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var entry in recentEntries)
+                            {
+                                <tr>
+                                    <td>
+                                        @entry.Date.ToString("dd.MM.yyyy")
+                                    </td>
+
+                                    <td>
+                                        @entry.Description
+                                    </td>
+
+                                    <td>
+                                        @if (entry.Type == EntryType.Income)
+                                        {
+                                            <span class="badge bg-success">
+                                                Einnahme
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                Ausgabe
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        @entry.Amount.ToString("N2") €
+                                    </td>
+                                </tr>
+                            }
+
+                            @if (!recentEntries.Any())
+                            {
+                                <tr>
+                                    <td colspan="4"
+                                        class="text-center text-muted py-5">
+                                        Noch keine Buchungen vorhanden.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-xl-4">
+        <div class="card h-100">
+            <div class="card-body">
+
+                <h4 class="mb-1">Schnellzugriff</h4>
+
+                <p class="text-muted small mb-4">
+                    Häufig verwendete Aktionen
+                </p>
+
+                <div class="d-grid gap-3">
+
+                    <a asp-controller="CashEntries"
+                       asp-action="Create"
+                       class="btn btn-primary dashboard-action">
+                        Neue Buchung
+                    </a>
+
+                    <a asp-controller="Invoices"
+                       asp-action="Create"
+                       class="btn btn-outline-primary dashboard-action">
+                        Neue Rechnung
+                    </a>
+
+                    <a asp-controller="CashEntries"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary dashboard-action">
+                        Kassenbuch öffnen
+                    </a>
+
+                    <a asp-controller="Invoices"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary dashboard-action">
+                        Rechnungen öffnen
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>

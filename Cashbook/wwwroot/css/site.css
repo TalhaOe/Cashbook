@@ -235,3 +235,19 @@ h1 {
 .card .section-label + h5 {
     margin-top: 0;
 }
+
+.dashboard-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+.dashboard-action {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
