@@ -154,6 +154,93 @@ namespace Cashbook.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            string userId = GetCurrentUserId();
+
+            var invoice = await _context.Invoices
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.UserId == userId);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            if (invoice.Status == InvoiceStatus.Cancelled)
+            {
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            // Offene Rechnung:
+            // keine Kassenbewegung vorhanden -> nur Status ändern
+            if (invoice.Status == InvoiceStatus.Open)
+            {
+                invoice.Status = InvoiceStatus.Cancelled;
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            // Bezahlte Rechnung:
+            // Gegenbuchung im Kassenbuch erzeugen
+            if (invoice.Status == InvoiceStatus.Paid)
+            {
+                var reversalEntry = new CashEntry
+                {
+                    Date = DateTime.Today,
+                    Description = $"Storno Rechnung {invoice.InvoiceNumber}",
+                    Amount = invoice.GrossAmount,
+
+                    Type = invoice.Type == InvoiceType.Outgoing
+                        ? EntryType.Expense
+                        : EntryType.Income,
+
+                    CreatedAt = DateTime.Now,
+                    UserId = userId,
+                    InvoiceId = invoice.Id
+                };
+
+                reversalEntry.ReceiptNumber =
+                    await GenerateCashEntryReceiptNumber(
+                        userId,
+                        reversalEntry.Date);
+
+                // Bei einer stornierten Ausgangsrechnung entsteht eine Ausgabe.
+                // Diese darf den Kassenbestand nicht negativ machen.
+                if (reversalEntry.Type == EntryType.Expense)
+                {
+                    bool balanceWouldBecomeNegative =
+                        await WouldCashBalanceBecomeNegative(
+                            userId,
+                            reversalEntry);
+
+                    if (balanceWouldBecomeNegative)
+                    {
+                        TempData["ErrorMessage"] =
+                            "Die Rechnung kann nicht storniert werden, " +
+                            "da die Gegenbuchung den Kassenbestand negativ machen würde.";
+
+                        return RedirectToAction(nameof(Details), new { id });
+                    }
+                }
+
+                invoice.Status = InvoiceStatus.Cancelled;
+
+                _context.CashEntries.Add(reversalEntry);
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAsPaid(int id)
         {
             string userId = GetCurrentUserId();

@@ -207,6 +207,28 @@
         </form>
     }
 
+    @if (Model.Status != Cashbook.Models.InvoiceStatus.Cancelled)
+    {
+        <form asp-action="Cancel"
+              asp-route-id="@Model.Id"
+              method="post"
+              class="d-inline"
+              onsubmit="return confirm('Möchtest du diese Rechnung wirklich stornieren?');">
+
+            <button type="submit"
+                    class="btn btn-danger">
+                Rechnung stornieren
+            </button>
+        </form>
+    }
+
+    @if (Model.Status == Cashbook.Models.InvoiceStatus.Cancelled)
+    {
+        <div class="alert alert-secondary">
+            Diese Rechnung wurde storniert.
+        </div>
+    }
+
     <a asp-action="Index"
        class="btn btn-secondary">
         Zurück
