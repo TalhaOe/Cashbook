@@ -1,0 +1,409 @@
+﻿@model Cashbook.Models.ViewModels.InvoiceCreateViewModel
+@using Cashbook.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Neue Rechnung";
+}
+
+<h1>Neue Rechnung</h1>
+
+<hr />
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <!-- Rechnungsdaten -->
+    <h4 class="mb-3">Rechnungsdaten</h4>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label asp-for="InvoiceDate" class="form-label"></label>
+            <input asp-for="InvoiceDate" class="form-control" />
+            <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="ServiceDate" class="form-label"></label>
+            <input asp-for="ServiceDate" class="form-control" />
+            <span asp-validation-for="ServiceDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label asp-for="Type" class="form-label"></label>
+
+            <select asp-for="Type"
+                    asp-items="Html.GetEnumSelectList<Cashbook.Models.InvoiceType>()"
+                    class="form-select">
+            </select>
+
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <!-- Rechnungssteller -->
+    <h4 class="mb-3">Rechnungssteller</h4>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="IssuerName" class="form-label"></label>
+            <input asp-for="IssuerName" class="form-control" />
+            <span asp-validation-for="IssuerName" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="IssuerVatIdentificationNumber" class="form-label"></label>
+            <input asp-for="IssuerVatIdentificationNumber" class="form-control" />
+            <span asp-validation-for="IssuerVatIdentificationNumber" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="IssuerStreet" class="form-label"></label>
+            <input asp-for="IssuerStreet" class="form-control" />
+            <span asp-validation-for="IssuerStreet" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-2 mb-3">
+            <label asp-for="IssuerPostalCode" class="form-label"></label>
+            <input asp-for="IssuerPostalCode" class="form-control" />
+            <span asp-validation-for="IssuerPostalCode" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="IssuerCity" class="form-label"></label>
+            <input asp-for="IssuerCity" class="form-control" />
+            <span asp-validation-for="IssuerCity" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <!-- Rechnungsempfänger -->
+    <h4 class="mt-4 mb-3">Rechnungsempfänger</h4>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="RecipientName" class="form-label"></label>
+            <input asp-for="RecipientName" class="form-control" />
+            <span asp-validation-for="RecipientName" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="RecipientVatIdentificationNumber" class="form-label"></label>
+            <input asp-for="RecipientVatIdentificationNumber" class="form-control" />
+            <span asp-validation-for="RecipientVatIdentificationNumber" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="RecipientStreet" class="form-label"></label>
+            <input asp-for="RecipientStreet" class="form-control" />
+            <span asp-validation-for="RecipientStreet" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-2 mb-3">
+            <label asp-for="RecipientPostalCode" class="form-label"></label>
+            <input asp-for="RecipientPostalCode" class="form-control" />
+            <span asp-validation-for="RecipientPostalCode" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="RecipientCity" class="form-label"></label>
+            <input asp-for="RecipientCity" class="form-control" />
+            <span asp-validation-for="RecipientCity" class="text-danger"></span>
+        </div>
+    </div>
+
+
+    <!-- Rechnungspositionen -->
+    <h4 class="mt-4 mb-3">Positionen</h4>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Beschreibung</th>
+                    <th style="width: 120px;">Menge</th>
+                    <th style="width: 170px;">Einzelpreis netto</th>
+                    <th style="width: 130px;">USt.</th>
+                    <th style="width: 150px;">Netto</th>
+                    <th style="width: 80px;"></th>
+                </tr>
+            </thead>
+
+            <tbody id="invoiceItems">
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    <tr class="invoice-item">
+                        <td>
+                            <input asp-for="Items[i].Description"
+                                   class="form-control description" />
+                        </td>
+
+                        <td>
+                            <input asp-for="Items[i].Quantity"
+                                   class="form-control quantity"
+                                   type="number"
+                                   min="0.01"
+                                   step="0.01" />
+                        </td>
+
+                        <td>
+                            <input asp-for="Items[i].UnitPrice"
+                                   class="form-control unit-price"
+                                   type="number"
+                                   min="0"
+                                   step="0.01" />
+                        </td>
+
+                        <td>
+                            <select asp-for="Items[i].VatRate"
+                                    class="form-select vat-rate">
+                                <option value="0">0 %</option>
+                                <option value="10">10 %</option>
+                                <option value="13">13 %</option>
+                                <option value="20">20 %</option>
+                            </select>
+                        </td>
+
+                        <td class="position-net">
+                            0,00 €
+                        </td>
+
+                        <td>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger remove-item">
+                                ×
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button type="button"
+            id="addItem"
+            class="btn btn-outline-primary mb-4">
+        + Position hinzufügen
+    </button>
+
+
+    <!-- Summen -->
+    <div class="row justify-content-end">
+        <div class="col-md-4">
+            <table class="table">
+                <tr>
+                    <th>Netto</th>
+                    <td class="text-end" id="totalNet">0,00 €</td>
+                </tr>
+
+                <tr>
+                    <th>USt.</th>
+                    <td class="text-end" id="totalVat">0,00 €</td>
+                </tr>
+
+                <tr>
+                    <th>Brutto</th>
+                    <td class="text-end fw-bold" id="totalGross">0,00 €</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">
+            Rechnung speichern
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Zurück
+        </a>
+    </div>
+</form>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const itemsContainer = document.getElementById("invoiceItems");
+        const addItemButton = document.getElementById("addItem");
+
+
+        function formatCurrency(value) {
+            return value.toLocaleString("de-AT", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " €";
+        }
+
+
+        function calculateTotals() {
+
+            let totalNet = 0;
+            let totalVat = 0;
+
+            document.querySelectorAll(".invoice-item").forEach(row => {
+
+                const quantity =
+                    parseFloat(row.querySelector(".quantity").value) || 0;
+
+                const unitPrice =
+                    parseFloat(row.querySelector(".unit-price").value) || 0;
+
+                const vatRate =
+                    parseFloat(row.querySelector(".vat-rate").value) || 0;
+
+                const net = quantity * unitPrice;
+                const vat = net * vatRate / 100;
+
+                row.querySelector(".position-net").textContent =
+                    formatCurrency(net);
+
+                totalNet += net;
+                totalVat += vat;
+            });
+
+            document.getElementById("totalNet").textContent =
+                formatCurrency(totalNet);
+
+            document.getElementById("totalVat").textContent =
+                formatCurrency(totalVat);
+
+            document.getElementById("totalGross").textContent =
+                formatCurrency(totalNet + totalVat);
+        }
+
+
+        function updateIndexes() {
+
+            const rows =
+                document.querySelectorAll(".invoice-item");
+
+            rows.forEach((row, index) => {
+
+                row.querySelector(".description").name =
+                    `Items[${index}].Description`;
+
+                row.querySelector(".quantity").name =
+                    `Items[${index}].Quantity`;
+
+                row.querySelector(".unit-price").name =
+                    `Items[${index}].UnitPrice`;
+
+                row.querySelector(".vat-rate").name =
+                    `Items[${index}].VatRate`;
+            });
+        }
+
+
+        function addItem() {
+
+            const index =
+                document.querySelectorAll(".invoice-item").length;
+
+            const row = document.createElement("tr");
+
+            row.classList.add("invoice-item");
+
+            row.innerHTML = `
+                <td>
+                    <input name="Items[${index}].Description"
+                           class="form-control description" />
+                </td>
+
+                <td>
+                    <input name="Items[${index}].Quantity"
+                           class="form-control quantity"
+                           type="number"
+                           min="0.01"
+                           step="0.01"
+                           value="1" />
+                </td>
+
+                <td>
+                    <input name="Items[${index}].UnitPrice"
+                           class="form-control unit-price"
+                           type="number"
+                           min="0"
+                           step="0.01"
+                           value="0" />
+                </td>
+
+                <td>
+                    <select name="Items[${index}].VatRate"
+                            class="form-select vat-rate">
+                        <option value="0">0 %</option>
+                        <option value="10">10 %</option>
+                        <option value="13">13 %</option>
+                        <option value="20" selected>20 %</option>
+                    </select>
+                </td>
+
+                <td class="position-net">
+                    0,00 €
+                </td>
+
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger remove-item">
+                        ×
+                    </button>
+                </td>
+            `;
+
+            itemsContainer.appendChild(row);
+
+            calculateTotals();
+        }
+
+
+        addItemButton.addEventListener("click", addItem);
+
+
+        itemsContainer.addEventListener("input", function (event) {
+
+            if (
+                event.target.classList.contains("quantity") ||
+                event.target.classList.contains("unit-price") ||
+                event.target.classList.contains("vat-rate")
+            ) {
+                calculateTotals();
+            }
+        });
+
+
+        itemsContainer.addEventListener("change", calculateTotals);
+
+
+        itemsContainer.addEventListener("click", function (event) {
+
+            if (!event.target.classList.contains("remove-item"))
+                return;
+
+            const rows =
+                document.querySelectorAll(".invoice-item");
+
+            if (rows.length <= 1) {
+                return;
+            }
+
+            event.target.closest(".invoice-item").remove();
+
+            updateIndexes();
+            calculateTotals();
+        });
+
+
+        calculateTotals();
+    </script>
+}

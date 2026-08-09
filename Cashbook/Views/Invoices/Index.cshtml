@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Cashbook.Models.Invoice>
+
+@{
+    ViewData["Title"] = "Rechnungen";
+}
+
+<h1>Rechnungen</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        Neue Rechnung
+    </a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rechnungsnummer</th>
+            <th>Datum</th>
+            <th>Empfänger</th>
+            <th>Netto</th>
+            <th>USt.</th>
+            <th>Brutto</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var invoice in Model)
+        {
+            <tr>
+                <td>
+                    @invoice.InvoiceNumber
+                </td>
+
+                <td>
+                    @invoice.InvoiceDate.ToString("dd.MM.yyyy")
+                </td>
+
+                <td>
+                    @invoice.RecipientName
+                </td>
+
+                <td>
+                    @invoice.NetAmount.ToString("N2") €
+                </td>
+
+                <td>
+                    @invoice.VatAmount.ToString("N2") €
+                </td>
+
+                <td>
+                    <strong>
+                        @invoice.GrossAmount.ToString("N2") €
+                    </strong>
+                </td>
+
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@invoice.Id"
+                       class="btn btn-sm btn-outline-secondary">
+                        Details
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

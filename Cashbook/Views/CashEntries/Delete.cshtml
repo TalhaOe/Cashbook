@@ -1,0 +1,70 @@
+@model Cashbook.Models.CashEntry
+
+@{
+    ViewData["Title"] = "Buchung löschen";
+}
+
+<h1>Buchung löschen</h1>
+
+<h3>Möchtest du diese Buchung wirklich löschen?</h3>
+
+<div>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-2">
+            Datum
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Date.ToString("dd.MM.yyyy")
+        </dd>
+
+        <dt class="col-sm-2">
+            Belegnummer
+        </dt>
+        <dd class="col-sm-10">
+            @Model.ReceiptNumber
+        </dd>
+
+        <dt class="col-sm-2">
+            Beschreibung
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Description
+        </dd>
+
+        <dt class="col-sm-2">
+            Betrag
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Amount.ToString("N2") €
+        </dd>
+
+        <dt class="col-sm-2">
+            Typ
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Type
+        </dd>
+
+        <dt class="col-sm-2">
+            Erstellt am
+        </dt>
+        <dd class="col-sm-10">
+            @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+
+        <input type="submit"
+               value="Löschen"
+               class="btn btn-danger" />
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Abbrechen
+        </a>
+    </form>
+</div>

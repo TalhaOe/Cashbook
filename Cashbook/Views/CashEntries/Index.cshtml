@@ -1,0 +1,125 @@
+@model Cashbook.Models.ViewModels.CashBookIndexViewModel
+
+@{
+    ViewData["Title"] = "Kassenbuch";
+}
+
+<h1>Kassenbuch</h1>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Einnahmen</h6>
+                <h4>@Model.TotalIncome.ToString("N2") €</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Ausgaben</h6>
+                <h4>@Model.TotalExpenses.ToString("N2") €</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Kassenstand</h6>
+                <h4>@Model.Balance.ToString("N2") €</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Neue Buchung</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Belegnummer</th>
+            <th>Beschreibung</th>
+            <th>Einnahme</th>
+            <th>Ausgabe</th>
+            <th>Bestand</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var row in Model.Entries)
+        {
+            var item = row.Entry;
+
+            <tr>
+                <td>
+                    @item.Date.ToString("dd.MM.yyyy")
+                </td>
+
+                <td>
+                    @item.ReceiptNumber
+                </td>
+
+                <td>
+                    @item.Description
+                </td>
+
+                <td>
+                    @if (item.Type == Cashbook.Models.EntryType.Income)
+                    {
+                        @($"{item.Amount:N2} €")
+                    }
+                </td>
+
+                <td>
+                    @if (item.Type == Cashbook.Models.EntryType.Expense)
+                    {
+                        @($"{item.Amount:N2} €")
+                    }
+                </td>
+
+                <td>
+                    <strong>@($"{row.RunningBalance:N2} €")</strong>
+                </td>
+
+                <td class="text-nowrap">
+                    @if (item.InvoiceId.HasValue)
+                    {
+                        <a asp-controller="Invoices"
+                           asp-action="Details"
+                           asp-route-id="@item.InvoiceId.Value"
+                           class="btn btn-sm btn-outline-success">
+                            Rechnung
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-primary">
+                            Bearbeiten
+                        </a>
+
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-secondary">
+                            Details
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-danger">
+                            Löschen
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

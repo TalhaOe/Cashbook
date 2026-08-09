@@ -1,0 +1,214 @@
+﻿@model Cashbook.Models.Invoice
+
+@{
+    ViewData["Title"] = "Rechnungsdetails";
+}
+
+<h1>Rechnungsdetails</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="mb-3">
+    <strong>Status:</strong>
+
+    @switch (Model.Status)
+    {
+        case Cashbook.Models.InvoiceStatus.Open:
+            <span class="badge bg-warning text-dark">Offen</span>
+            break;
+
+        case Cashbook.Models.InvoiceStatus.Paid:
+            <span class="badge bg-success">Bezahlt</span>
+            break;
+
+        case Cashbook.Models.InvoiceStatus.Cancelled:
+            <span class="badge bg-secondary">Storniert</span>
+            break;
+    }
+</div>
+
+@if (Model.PaidAt.HasValue)
+{
+    <div class="mb-4">
+        <strong>Bezahlt am:</strong>
+        @Model.PaidAt.Value.ToString("dd.MM.yyyy HH:mm")
+    </div>
+}
+
+<hr />
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h4>Rechnungssteller</h4>
+
+        <p class="mb-1">
+            <strong>@Model.IssuerName</strong>
+        </p>
+
+        <p class="mb-1">
+            @Model.IssuerStreet
+        </p>
+
+        <p class="mb-1">
+            @Model.IssuerPostalCode @Model.IssuerCity
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.IssuerVatIdentificationNumber))
+        {
+            <p class="mb-1">
+                UID: @Model.IssuerVatIdentificationNumber
+            </p>
+        }
+    </div>
+
+    <div class="col-md-6">
+        <h4>Rechnungsempfänger</h4>
+
+        <p class="mb-1">
+            <strong>@Model.RecipientName</strong>
+        </p>
+
+        <p class="mb-1">
+            @Model.RecipientStreet
+        </p>
+
+        <p class="mb-1">
+            @Model.RecipientPostalCode @Model.RecipientCity
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.RecipientVatIdentificationNumber))
+        {
+            <p class="mb-1">
+                UID: @Model.RecipientVatIdentificationNumber
+            </p>
+        }
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <strong>Rechnungsnummer</strong><br />
+        @Model.InvoiceNumber
+    </div>
+
+    <div class="col-md-4">
+        <strong>Rechnungsdatum</strong><br />
+        @Model.InvoiceDate.ToString("dd.MM.yyyy")
+    </div>
+
+    <div class="col-md-4">
+        <strong>Leistungsdatum</strong><br />
+        @Model.ServiceDate.ToString("dd.MM.yyyy")
+    </div>
+</div>
+
+<div class="mb-4">
+    <strong>Rechnungsart:</strong>
+
+    @if (Model.Type == Cashbook.Models.InvoiceType.Outgoing)
+    {
+        <span>Ausgangsrechnung</span>
+    }
+    else
+    {
+        <span>Eingangsrechnung</span>
+    }
+</div>
+
+<h4>Positionen</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Beschreibung</th>
+            <th>Menge</th>
+            <th>Einzelpreis netto</th>
+            <th>USt.</th>
+            <th>Netto</th>
+            <th>USt.-Betrag</th>
+            <th>Brutto</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            var net =
+                Math.Round(
+                    item.Quantity * item.UnitPrice,
+                    2,
+                    MidpointRounding.AwayFromZero);
+
+            var vat =
+                Math.Round(
+                    net * item.VatRate / 100m,
+                    2,
+                    MidpointRounding.AwayFromZero);
+
+            var gross = net + vat;
+
+            <tr>
+                <td>@item.Description</td>
+                <td>@item.Quantity.ToString("N2")</td>
+                <td>@item.UnitPrice.ToString("N2") €</td>
+                <td>@item.VatRate.ToString("N2") %</td>
+                <td>@net.ToString("N2") €</td>
+                <td>@vat.ToString("N2") €</td>
+                <td>@gross.ToString("N2") €</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="row justify-content-end">
+    <div class="col-md-4">
+        <table class="table">
+            <tr>
+                <th>Netto</th>
+                <td class="text-end">
+                    @Model.NetAmount.ToString("N2") €
+                </td>
+            </tr>
+
+            <tr>
+                <th>USt.</th>
+                <td class="text-end">
+                    @Model.VatAmount.ToString("N2") €
+                </td>
+            </tr>
+
+            <tr>
+                <th>Brutto</th>
+                <td class="text-end fw-bold">
+                    @Model.GrossAmount.ToString("N2") €
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3">
+    @if (Model.Status == Cashbook.Models.InvoiceStatus.Open)
+    {
+        <form asp-action="MarkAsPaid"
+              asp-route-id="@Model.Id"
+              method="post"
+              class="d-inline">
+
+            <button type="submit"
+                    class="btn btn-success">
+                Als bezahlt markieren
+            </button>
+        </form>
+    }
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Zurück
+    </a>
+</div>
