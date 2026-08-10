@@ -12,14 +12,22 @@
 </head>
 
 <body>
-    <header class="app-header">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
-            <div class="container-fluid px-4">
 
-                <a class="navbar-brand fw-bold fs-4"
+    @{
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    }
+
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid app-navbar-container">
+
+                <a class="navbar-brand"
                    asp-controller="Home"
                    asp-action="Index">
-                    Cashbook
+
+                    <span class="brand-mark">C</span>
+                    <span class="brand-text">Cashbook</span>
+
                 </a>
 
                 <button class="navbar-toggler"
@@ -29,15 +37,17 @@
                         aria-controls="mainNavbar"
                         aria-expanded="false"
                         aria-label="Navigation öffnen">
+
                     <span class="navbar-toggler-icon"></span>
+
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
 
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav app-nav me-auto">
 
                         <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link @(controller == "Home" ? "active" : "")"
                                asp-controller="Home"
                                asp-action="Index">
                                 Dashboard
@@ -45,7 +55,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link @(controller == "CashEntries" ? "active" : "")"
                                asp-controller="CashEntries"
                                asp-action="Index">
                                 Kassenbuch
@@ -53,7 +63,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link @(controller == "Invoices" ? "active" : "")"
                                asp-controller="Invoices"
                                asp-action="Index">
                                 Rechnungen
@@ -62,7 +72,32 @@
 
                     </ul>
 
-                    <partial name="_LoginPartial" />
+                    <div class="app-user-area">
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="app-user-info">
+
+                                <div class="app-user-avatar">
+                                    @(User.Identity.Name?.Substring(0, 1).ToUpper())
+                                </div>
+
+                                <div class="app-user-text">
+                                    <span class="app-user-label">
+                                        Angemeldet als
+                                    </span>
+
+                                    <span class="app-user-name">
+                                        @User.Identity.Name
+                                    </span>
+                                </div>
+
+                            </div>
+                        }
+
+                        <partial name="_LoginPartial" />
+
+                    </div>
 
                 </div>
             </div>
@@ -70,18 +105,17 @@
     </header>
 
     <main class="app-main">
-        <div class="container-fluid px-4 py-4">
+        <div class="container-fluid app-content-container">
             @RenderBody()
         </div>
     </main>
 
-    <footer class="app-footer border-top">
-        <div class="container-fluid px-4 py-3 d-flex justify-content-between">
+    <footer class="app-footer">
+        <div class="container-fluid app-content-container app-footer-inner">
             <span>© 2026 Cashbook</span>
 
             <a asp-controller="Home"
-               asp-action="Privacy"
-               class="text-decoration-none">
+               asp-action="Privacy">
                 Datenschutz
             </a>
         </div>
@@ -92,5 +126,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

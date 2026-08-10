@@ -8,74 +8,130 @@
         ?? new List<CashEntry>();
 }
 
-<div class="mb-4">
-    <h1 class="mb-1">Dashboard</h1>
-
-    <p class="text-muted mb-0">
-        Überblick über dein Kassenbuch und deine Rechnungen
-    </p>
+<div class="dashboard-header mb-4">
+    <div>
+        <h1 class="mb-1">Dashboard</h1>
+        <p class="text-muted mb-0">
+            Überblick über dein Kassenbuch und deine Rechnungen
+        </p>
+    </div>
 </div>
 
 <div class="row g-3 mb-4">
 
     <div class="col-md-6 col-xl-3">
-        <div class="card dashboard-card h-100">
+        <div class="card dashboard-kpi dashboard-kpi-success h-100">
             <div class="card-body">
-                <div class="summary-label">
-                    Einnahmen
+
+                <div class="dashboard-kpi-top">
+                    <div>
+                        <div class="summary-label">
+                            Einnahmen
+                        </div>
+
+                        <div class="summary-value text-success">
+                            @ViewBag.TotalIncome.ToString("N2") €
+                        </div>
+                    </div>
+
+                    <div class="dashboard-kpi-icon">
+                        ↓
+                    </div>
                 </div>
 
-                <div class="summary-value text-success">
-                    @ViewBag.TotalIncome.ToString("N2") €
+                <div class="dashboard-kpi-note">
+                    Gesamte erfasste Einnahmen
                 </div>
+
             </div>
         </div>
     </div>
 
     <div class="col-md-6 col-xl-3">
-        <div class="card dashboard-card h-100">
+        <div class="card dashboard-kpi dashboard-kpi-danger h-100">
             <div class="card-body">
-                <div class="summary-label">
-                    Ausgaben
+
+                <div class="dashboard-kpi-top">
+                    <div>
+                        <div class="summary-label">
+                            Ausgaben
+                        </div>
+
+                        <div class="summary-value text-danger">
+                            @ViewBag.TotalExpenses.ToString("N2") €
+                        </div>
+                    </div>
+
+                    <div class="dashboard-kpi-icon">
+                        ↑
+                    </div>
                 </div>
 
-                <div class="summary-value text-danger">
-                    @ViewBag.TotalExpenses.ToString("N2") €
+                <div class="dashboard-kpi-note">
+                    Gesamte erfasste Ausgaben
                 </div>
+
             </div>
         </div>
     </div>
 
     <div class="col-md-6 col-xl-3">
-        <div class="card dashboard-card h-100">
+        <div class="card dashboard-kpi dashboard-kpi-primary h-100">
             <div class="card-body">
-                <div class="summary-label">
-                    Kassenstand
+
+                <div class="dashboard-kpi-top">
+                    <div>
+                        <div class="summary-label">
+                            Kassenstand
+                        </div>
+
+                        <div class="summary-value">
+                            @ViewBag.Balance.ToString("N2") €
+                        </div>
+                    </div>
+
+                    <div class="dashboard-kpi-icon">
+                        €
+                    </div>
                 </div>
 
-                <div class="summary-value">
-                    @ViewBag.Balance.ToString("N2") €
+                <div class="dashboard-kpi-note">
+                    Aktueller verfügbarer Bestand
                 </div>
+
             </div>
         </div>
     </div>
 
     <div class="col-md-6 col-xl-3">
-        <div class="card dashboard-card h-100">
+        <div class="card dashboard-kpi dashboard-kpi-warning h-100">
             <div class="card-body">
-                <div class="summary-label">
-                    Offene Rechnungen
+
+                <div class="dashboard-kpi-top">
+                    <div>
+                        <div class="summary-label">
+                            Offene Rechnungen
+                        </div>
+
+                        <div class="summary-value @(ViewBag.OpenInvoices > 0 ? "text-warning" : "")">
+                            @ViewBag.OpenInvoices
+                        </div>
+                    </div>
+
+                    <div class="dashboard-kpi-icon">
+                        #
+                    </div>
                 </div>
 
-                <div class="summary-value">
-                    @ViewBag.OpenInvoices
+                <div class="dashboard-kpi-note">
+                    Noch nicht bezahlte Rechnungen
                 </div>
+
             </div>
         </div>
     </div>
 
 </div>
-
 
 <div class="row g-4">
 
@@ -87,6 +143,7 @@
                 <div class="d-flex justify-content-between align-items-center px-4 pt-4 pb-3">
                     <div>
                         <h4 class="mb-1">Letzte Buchungen</h4>
+
                         <p class="text-muted small mb-0">
                             Die zuletzt erfassten Kassenbewegungen
                         </p>
@@ -101,6 +158,7 @@
 
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
+
                         <thead>
                             <tr>
                                 <th>Datum</th>
@@ -111,6 +169,7 @@
                         </thead>
 
                         <tbody>
+
                             @foreach (var entry in recentEntries)
                             {
                                 <tr>
@@ -118,7 +177,7 @@
                                         @entry.Date.ToString("dd.MM.yyyy")
                                     </td>
 
-                                    <td>
+                                    <td class="fw-semibold">
                                         @entry.Description
                                     </td>
 
@@ -138,7 +197,18 @@
                                     </td>
 
                                     <td class="text-end fw-semibold">
-                                        @entry.Amount.ToString("N2") €
+                                        @if (entry.Type == EntryType.Income)
+                                        {
+                                            <span class="text-success">
+                                                +@entry.Amount.ToString("N2") €
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger">
+                                                -@entry.Amount.ToString("N2") €
+                                            </span>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -147,12 +217,37 @@
                             {
                                 <tr>
                                     <td colspan="4"
-                                        class="text-center text-muted py-5">
-                                        Noch keine Buchungen vorhanden.
+                                        class="text-center py-5">
+
+                                        <div class="dashboard-empty-state">
+
+                                            <div class="dashboard-empty-icon">
+                                                €
+                                            </div>
+
+                                            <div class="fw-semibold mb-1">
+                                                Noch keine Buchungen
+                                            </div>
+
+                                            <div class="text-muted small mb-3">
+                                                Sobald du Einnahmen oder Ausgaben erfasst,
+                                                erscheinen sie hier.
+                                            </div>
+
+                                            <a asp-controller="CashEntries"
+                                               asp-action="Create"
+                                               class="btn btn-sm btn-primary">
+                                                Erste Buchung erstellen
+                                            </a>
+
+                                        </div>
+
                                     </td>
                                 </tr>
                             }
+
                         </tbody>
+
                     </table>
                 </div>
 
@@ -165,7 +260,9 @@
         <div class="card h-100">
             <div class="card-body">
 
-                <h4 class="mb-1">Schnellzugriff</h4>
+                <h4 class="mb-1">
+                    Schnellzugriff
+                </h4>
 
                 <p class="text-muted small mb-4">
                     Häufig verwendete Aktionen
@@ -175,26 +272,82 @@
 
                     <a asp-controller="CashEntries"
                        asp-action="Create"
-                       class="btn btn-primary dashboard-action">
-                        Neue Buchung
+                       class="dashboard-quick-action dashboard-quick-primary">
+
+                        <div class="dashboard-quick-icon">
+                            +
+                        </div>
+
+                        <div>
+                            <div class="dashboard-quick-title">
+                                Neue Buchung
+                            </div>
+
+                            <div class="dashboard-quick-subtitle">
+                                Einnahme oder Ausgabe erfassen
+                            </div>
+                        </div>
+
                     </a>
 
                     <a asp-controller="Invoices"
                        asp-action="Create"
-                       class="btn btn-outline-primary dashboard-action">
-                        Neue Rechnung
+                       class="dashboard-quick-action">
+
+                        <div class="dashboard-quick-icon">
+                            #
+                        </div>
+
+                        <div>
+                            <div class="dashboard-quick-title">
+                                Neue Rechnung
+                            </div>
+
+                            <div class="dashboard-quick-subtitle">
+                                Rechnung erstellen
+                            </div>
+                        </div>
+
                     </a>
 
                     <a asp-controller="CashEntries"
                        asp-action="Index"
-                       class="btn btn-outline-secondary dashboard-action">
-                        Kassenbuch öffnen
+                       class="dashboard-quick-action">
+
+                        <div class="dashboard-quick-icon">
+                            €
+                        </div>
+
+                        <div>
+                            <div class="dashboard-quick-title">
+                                Kassenbuch
+                            </div>
+
+                            <div class="dashboard-quick-subtitle">
+                                Alle Buchungen anzeigen
+                            </div>
+                        </div>
+
                     </a>
 
                     <a asp-controller="Invoices"
                        asp-action="Index"
-                       class="btn btn-outline-secondary dashboard-action">
-                        Rechnungen öffnen
+                       class="dashboard-quick-action">
+
+                        <div class="dashboard-quick-icon">
+                            →
+                        </div>
+
+                        <div>
+                            <div class="dashboard-quick-title">
+                                Rechnungen
+                            </div>
+
+                            <div class="dashboard-quick-subtitle">
+                                Rechnungen verwalten
+                            </div>
+                        </div>
+
                     </a>
 
                 </div>
